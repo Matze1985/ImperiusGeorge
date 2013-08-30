@@ -51,7 +51,15 @@ public class Server extends NanoHTTPD {
             for(int i = 0; i < args.length; i++) {
                 //Dealing with primitives
                 if(args[i] instanceof Double) {
-
+                    Double temp = (Double) args[i];
+                    String paramName = parameterTypes[i].getSimpleName();
+                    if(paramName.equals("int")) {
+                        args[i] = temp.intValue();
+                    } else if (paramName.equals("long")) {
+                        args[i] = temp.longValue();
+                    } else if (paramName.equals("float")) {
+                        args[i] = temp.floatValue();
+                    } else {}
                 } else {
                     args[i] = parameterTypes[i].cast(args[i]);
                 }
