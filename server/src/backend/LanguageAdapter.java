@@ -7,6 +7,8 @@ import java.util.Map;
 import org.json.JSONArray;
 import org.json.JSONException;
 
+import com.google.gson.Gson;
+
 
 public class LanguageAdapter {
     private Map<String,Object> mStored = new HashMap<String,Object>();
@@ -19,7 +21,7 @@ public class LanguageAdapter {
         Class<?> cl = findClass(on);
         if (cl != null) {
             log("static method");
-            return runClassMethod(cl, args);
+            return runClassMethod(cl, method, args);
         }
 
         return null;
@@ -33,16 +35,15 @@ public class LanguageAdapter {
         }
     }
 
-    private String runClassMethod(Class<?> cl, String argsString) throws JSONException, IllegalAccessException, InvocationTargetException {
+    private String runClassMethod(Class<?> cl, String method, String argsString) throws JSONException, IllegalAccessException, InvocationTargetException {
         Method[] methods = cl.getDeclaredMethods();
-        //JSONArray argsArray = new JSONArray(argsString);
+        Object[] args = new Gson().fromJson(argsString,Object[].class);
 
         for (Method m : methods) {
             Class<?>[] argTypes = m.getParameterTypes();
-            if (argTypes.length == 0) { //argsArray.length()) {
-
+            if (m.getName().equalsIgnoreCase(method) && argTypes.length == args.length) {
                 try {
-                    return adaptReturns(m.invoke(null, null)); //adaptArgs(argsArray, argTypes)));
+                    return adaptReturn(m.invoke(null, adaptArgs(args, argTypes)));
                 } catch (IllegalArgumentException e) { continue; }
             }
         }
@@ -53,12 +54,28 @@ public class LanguageAdapter {
         return null;
     }
 
-    private String adaptReturns(Object result) {
+    private String adaptReturn(Object result) {
         return "" + result;
     }
 
-    private Object adaptArgs(JSONArray argsArray, Class<?>[] argTypes) {
-        return argsArray;
+    private Object[] adaptArgs(Object[] args, Class<?>[] argTypes) {
+    	for(int i = 0; i < args.length; i++) {
+    		//Primitives
+    		if(args[i] instanceof Double) {
+    			Double temp = (Double) args[i];
+    			String paramName = argTypes[i].getSimpleName();
+    			if(paramName.equals("int")) {
+    				args[i] = temp.intValue();
+    			} else if(paramName.equals("long")) {
+    				args[i] = temp.longValue();
+    			} else if(paramName.equals("float")) {
+    				args[i] = temp.floatValue();
+    			}
+    		} else if(!(args[i] instanceof Boolean)){
+    			args[i] = argTypes[i].cast(args[i]);
+    		}
+    	}
+        return args;
     }
 
 
