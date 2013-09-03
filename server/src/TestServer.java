@@ -1,3 +1,5 @@
+import backend.Server;
+
 import com.android.uiautomator.testrunner.UiAutomatorTestCase;
 
 public class TestServer extends UiAutomatorTestCase {
