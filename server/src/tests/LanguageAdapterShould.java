@@ -44,8 +44,9 @@ public class LanguageAdapterShould extends TestCase {
     public void testStaticMethodVoidParam() throws Exception {
         TestClass.called = false;
         la.run("tests.LanguageAdapterShould$TestClass","call","[true]");
-
         assertTrue(TestClass.called);
+        la.run("tests.LanguageAdapterShould$TestClass","call","[false]");
+        assertFalse(TestClass.called);
     }
 
     public void testStaticMethodReturnParam() throws Exception {
@@ -72,7 +73,7 @@ public class LanguageAdapterShould extends TestCase {
     }
 
     public void testConstructInstance() throws Exception {
-    	String hash = la.run("tests.OtherTestClass", "new","[]");
+    	String hash = la.run("tests.LanguageAdapterShould$OtherTestClass", "new","[]");
     	String res = la.run(hash,"isConstructed","[]");
 
     	assertEquals("true",res);

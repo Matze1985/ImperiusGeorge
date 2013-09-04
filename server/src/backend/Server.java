@@ -5,14 +5,14 @@ import fi.iki.elonen.NanoHTTPD;
 
 public class Server extends NanoHTTPD {
 
-    private LanguageAdapter la;
+    private LanguageAdapter la = new LanguageAdapter();
 
-    public Server() {
-        super(7120);
+    public Server(int port) {
+        super(port);
     }
 
     @Override
-    public Response serve(String uri, Method method, Map<String, String> headers, Map<String, String> params,Map<String, String> files) {
+    public Response serve(String uri, Method method, Map<String, String> headers, Map<String, String> params, Map<String, String> files) {
         try {
             if (uri.equalsIgnoreCase("/execute")) { return execute(params); }
             else if(method == Method.GET && uri.equalsIgnoreCase("/clean")) { return clean(); }
@@ -20,7 +20,7 @@ public class Server extends NanoHTTPD {
             System.out.println(exceptionToString(e));
             return new Response("Somebody fucked up :|\n" + exceptionToString(e));
         }
-        return new Response("no dice grandma");
+        return new Response("no dice grandma, params are:" + params);
     }
 
     public Response clean() {
