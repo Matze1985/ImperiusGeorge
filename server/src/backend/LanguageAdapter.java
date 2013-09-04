@@ -1,4 +1,6 @@
 package backend;
+
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -6,19 +8,21 @@ import java.util.Map;
 
 import com.google.gson.Gson;
 
-
 public class LanguageAdapter {
-    private Map<String,Object> mStored = new HashMap<String,Object>();
-
+    private Map<String, Object> mStored = new HashMap<String, Object>();
 
     public void clear() { mStored.clear(); }
 
-    public String run(String on, String method, String argsString) throws IllegalAccessException, InvocationTargetException, ClassNotFoundException {
+    public String run(String on, String method, String argsString) throws IllegalAccessException, InvocationTargetException, ClassNotFoundException, InstantiationException {
         Object instance = null;
         Method[] methods = null;
         Object[] args = new Gson().fromJson(argsString,Object[].class);
 
         Class<?> cl = findClass(on);
+        if(method.equals("new")) {
+            log("constructor");
+            return construct(cl,args);
+        }
         if (cl != null) {
             log("running method "+method+" on static class "+cl);
             methods = cl.getDeclaredMethods();
@@ -59,10 +63,29 @@ public class LanguageAdapter {
         }
     }
 
+    private String construct(Class<?> cl, Object[] args) throws InstantiationException, IllegalAccessException, InvocationTargetException{
+        Constructor<?>[] constructors = cl.getDeclaredConstructors();
+
+        for(Constructor<?> c : constructors) {
+            System.out.println("for loop");
+            Class<?>[] argTypes = c.getParameterTypes();
+            if(argTypes.length == args.length) {
+                try {
+                    System.out.println("amama");
+                    return adaptReturn(c.newInstance(adaptArgs(args,argTypes)));
+                } catch (IllegalArgumentException e) {
+                    continue;
+                }
+            }
+        }
+
+        return null;
+    }
+
     private Object[] adaptArgs(Object[] args, Class<?>[] argTypes) {
-        for(int i = 0; i < args.length; i++) {
-            //Primitives
-            if(args[i] instanceof Double) {
+        for (int i = 0; i < args.length; i++) {
+            // Primitives
+            if (args[i] instanceof Double) {
                 Double temp = (Double) args[i];
                 String paramName = argTypes[i].getSimpleName();
                 if (paramName.equals("int")) {
@@ -72,13 +95,12 @@ public class LanguageAdapter {
                 } else if (paramName.equals("float")) {
                     args[i] = temp.floatValue();
                 }
-            } else if (!(args[i] instanceof Boolean)){
+            } else if (!(args[i] instanceof Boolean)) {
                 args[i] = argTypes[i].cast(args[i]);
             }
         }
         return args;
     }
-
 
     public static void log(String s) {
         System.out.println(s);

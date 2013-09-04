@@ -25,9 +25,13 @@ public class LanguageAdapterShould extends TestCase {
         public int instanceMethod() { return 45; }
     }
 
-    public class OtherTestClass {
-        public boolean constructed = false;
-        OtherTestClass() { constructed = true; }
+    public static class OtherTestClass {
+    	public boolean constructed = false;
+    	public boolean called  = false;
+    	public OtherTestClass() { constructed = true; }
+    	public boolean isConstructed() { return constructed; }
+    	public void setCalled(boolean called) { this.called = called; }
+    	public String getCalled(String arbitraryParam) { return arbitraryParam + called; }
     }
 
     public void testStaticMethodVoidVoid() throws Exception {
@@ -67,4 +71,21 @@ public class LanguageAdapterShould extends TestCase {
         assertEquals("45", ret2);
     }
 
+    public void testConstructInstance() throws Exception {
+    	String hash = la.run("tests.OtherTestClass", "new","[]");
+    	String res = la.run(hash,"isConstructed","[]");
+
+    	assertEquals("true",res);
+
+    }
+
+    public void testInstanceReturnParameter() throws Exception {
+        String tag = "RESULT OF CALLED: ";
+
+        String hash = la.run("tests.LanguageAdapterShould$OtherTestClass", "new", "[]");
+        la.run(hash,"setCalled","[true]");
+        String res = la.run(hash,"getCalled","[\"" + tag + "\"]");
+
+        assertEquals(tag + "true",res);
+    }
 }
