@@ -4,9 +4,6 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-
 import com.google.gson.Gson;
 
 
@@ -16,15 +13,31 @@ public class LanguageAdapter {
 
     public void clear() { mStored.clear(); }
 
-    public String run(String on, String method, String args) throws JSONException, IllegalAccessException, InvocationTargetException {
-        log("running "+ method + " on "+ on + " with "+ args);
+    public String run(String on, String method, String argsString) throws IllegalAccessException, InvocationTargetException, ClassNotFoundException {
+        Object instance = null;
+        Method[] methods = null;
+        Object[] args = new Gson().fromJson(argsString,Object[].class);
+
         Class<?> cl = findClass(on);
         if (cl != null) {
-            log("static method");
-            return runClassMethod(cl, method, args);
-        }
+            log("running method "+method+" on static class "+cl);
+            methods = cl.getDeclaredMethods();
+        } else if ((instance = mStored.get(on)) != null) {
+            log("running method "+method+" on instance "+instance);
+            methods = instance.getClass().getDeclaredMethods();
+        } else { throw new ClassNotFoundException("Object/class '"+on+"' not found."); }
 
-        return null;
+
+        for (Method m : methods) {
+            Class<?>[] argTypes = m.getParameterTypes();
+            if (m.getName().equalsIgnoreCase(method) && argTypes.length == args.length) {
+                try {
+                    Object ret = m.invoke(instance, adaptArgs(args, argTypes));
+                    return (m.getReturnType() == Void.TYPE)? "" : adaptReturn(ret);
+                } catch (IllegalArgumentException e) { continue; }
+            }
+        }
+        throw new NoSuchMethodError("Method "+method+" not found. instance="+instance+", class="+cl);
     }
 
     private Class<?> findClass(String string) {
@@ -35,46 +48,34 @@ public class LanguageAdapter {
         }
     }
 
-    private String runClassMethod(Class<?> cl, String method, String argsString) throws JSONException, IllegalAccessException, InvocationTargetException {
-        Method[] methods = cl.getDeclaredMethods();
-        Object[] args = new Gson().fromJson(argsString,Object[].class);
-
-        for (Method m : methods) {
-            Class<?>[] argTypes = m.getParameterTypes();
-            if (m.getName().equalsIgnoreCase(method) && argTypes.length == args.length) {
-                try {
-                    return adaptReturn(m.invoke(null, adaptArgs(args, argTypes)));
-                } catch (IllegalArgumentException e) { continue; }
-            }
+    private String adaptReturn(Object res) {
+        log("returning "+res + " of "+res.getClass().getPackage());
+        if (res != null && res.getClass().toString().contains("java.lang")) {
+            return "" + res;
+        } else {
+            String hashcode = "hash:"+res.hashCode();
+            mStored.put(hashcode, res);
+            return hashcode;
         }
-        return null;
-    }
-
-    private String runInstanceMethod(Object o, String args) {
-        return null;
-    }
-
-    private String adaptReturn(Object result) {
-        return "" + result;
     }
 
     private Object[] adaptArgs(Object[] args, Class<?>[] argTypes) {
-    	for(int i = 0; i < args.length; i++) {
-    		//Primitives
-    		if(args[i] instanceof Double) {
-    			Double temp = (Double) args[i];
-    			String paramName = argTypes[i].getSimpleName();
-    			if(paramName.equals("int")) {
-    				args[i] = temp.intValue();
-    			} else if(paramName.equals("long")) {
-    				args[i] = temp.longValue();
-    			} else if(paramName.equals("float")) {
-    				args[i] = temp.floatValue();
-    			}
-    		} else if(!(args[i] instanceof Boolean)){
-    			args[i] = argTypes[i].cast(args[i]);
-    		}
-    	}
+        for(int i = 0; i < args.length; i++) {
+            //Primitives
+            if(args[i] instanceof Double) {
+                Double temp = (Double) args[i];
+                String paramName = argTypes[i].getSimpleName();
+                if (paramName.equals("int")) {
+                    args[i] = temp.intValue();
+                } else if (paramName.equals("long")) {
+                    args[i] = temp.longValue();
+                } else if (paramName.equals("float")) {
+                    args[i] = temp.floatValue();
+                }
+            } else if (!(args[i] instanceof Boolean)){
+                args[i] = argTypes[i].cast(args[i]);
+            }
+        }
         return args;
     }
 
