@@ -1,7 +1,11 @@
 package imperiusgeorge.backend;
+import java.util.HashMap;
 import java.util.Map;
 
+import org.json.simple.JSONObject;
+
 import fi.iki.elonen.NanoHTTPD;
+import fi.iki.elonen.NanoHTTPD.Response.Status;
 
 public class Server extends NanoHTTPD {
 
@@ -17,30 +21,28 @@ public class Server extends NanoHTTPD {
             if (uri.equalsIgnoreCase("/execute")) { return execute(params); }
             else if(method == Method.GET && uri.equalsIgnoreCase("/clean")) { return clean(); }
         } catch(Exception e) {
-            System.out.println(exceptionToString(e));
-            return new Response("Somebody fucked up :|\n" + exceptionToString(e));
+            String exceptionString = exceptionToString(e);
+            System.out.println(exceptionString);
+            String exceptionJSON = exceptionToJSON(exceptionString,la.exportLogs());
+            return new Response(Status.NOT_ACCEPTABLE,"application/json",exceptionJSON);
         }
         return new Response("no dice grandma, params are:" + params);
     }
 
     public Response clean() {
         la.clear();
-        return new Response("Cleaning successful!");
+        return new Response(Status.OK,"text/plain","Cleaning successful!");
     }
 
     public Response execute(Map<String,String> params) throws Exception {
-
         String on = params.get("on");
         String method = params.get("method");
         String args = params.get("args");
 
         String res = la.run(on, method, args);
 
-        return new Response(res);
+        return new Response(Status.OK,"text/plain",res);
     }
-
-
-
 
     public static String exceptionToString(Throwable e) {
         String ret = "";
@@ -53,4 +55,10 @@ public class Server extends NanoHTTPD {
         return ret;
     }
 
+    public String exceptionToJSON(String exceptionString,String logString) {
+        Map<String,String> resp = new HashMap<String,String>();
+        resp.put("exception", exceptionString);
+        resp.put("logs", la.exportLogs());
+        return JSONObject.toJSONString(resp);
+    }
 }

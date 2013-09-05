@@ -36,44 +36,44 @@ public class LanguageAdapterShould extends TestCase {
 
     public void testStaticMethodVoidVoid() throws Exception {
         TestClass.called = false;
-        la.run("tests.LanguageAdapterShould$TestClass", "call", "[]");
+        la.run("imperiusgeorge.backend.tests.LanguageAdapterShould$TestClass", "call", "[]");
 
         assertTrue(TestClass.called);
     }
 
     public void testStaticMethodVoidParam() throws Exception {
         TestClass.called = false;
-        la.run("tests.LanguageAdapterShould$TestClass","call","[true]");
+        la.run("imperiusgeorge.backend.tests.LanguageAdapterShould$TestClass","call","[true]");
         assertTrue(TestClass.called);
-        la.run("tests.LanguageAdapterShould$TestClass","call","[false]");
+        la.run("imperiusgeorge.backend.tests.LanguageAdapterShould$TestClass","call","[false]");
         assertFalse(TestClass.called);
     }
 
     public void testStaticMethodReturnParam() throws Exception {
         TestClass.called = false;
-        String res = la.run("tests.LanguageAdapterShould$TestClass","callAndResponse","[true]");
+        String res = la.run("imperiusgeorge.backend.tests.LanguageAdapterShould$TestClass","callAndResponse","[true]");
 
         assertTrue(TestClass.called);
         assertEquals("true",res);
     }
 
     public void testMethodReturns() throws Exception {
-        assertEquals("", la.run("tests.LanguageAdapterShould$TestClass", "call", "[]"));
-        assertEquals("hello world", la.run("tests.LanguageAdapterShould$TestClass", "callReturnString", "[]"));
-        assertEquals("42", la.run("tests.LanguageAdapterShould$TestClass", "callReturnInt", "[]"));
-        assertEquals("3.14", la.run("tests.LanguageAdapterShould$TestClass", "callReturnDouble", "[]"));
-        assertEquals("10000", la.run("tests.LanguageAdapterShould$TestClass", "callReturnLong", "[]"));
+        assertEquals("", la.run("imperiusgeorge.backend.tests.LanguageAdapterShould$TestClass", "call", "[]"));
+        assertEquals("\"hello world\"", la.run("imperiusgeorge.backend.tests.LanguageAdapterShould$TestClass", "callReturnString", "[]"));
+        assertEquals("42", la.run("imperiusgeorge.backend.tests.LanguageAdapterShould$TestClass", "callReturnInt", "[]"));
+        assertEquals("3.14", la.run("imperiusgeorge.backend.tests.LanguageAdapterShould$TestClass", "callReturnDouble", "[]"));
+        assertEquals("10000", la.run("imperiusgeorge.backend.tests.LanguageAdapterShould$TestClass", "callReturnLong", "[]"));
     }
 
 
     public void testInstanceReturn() throws Exception {
-        String ret = la.run("tests.LanguageAdapterShould$TestClass", "callReturnObj", "[]");
+        String ret = la.run("imperiusgeorge.backend.tests.LanguageAdapterShould$TestClass", "callReturnObj", "[]");
         String ret2 = la.run(ret, "instanceMethod", "[]");
         assertEquals("45", ret2);
     }
 
     public void testConstructInstance() throws Exception {
-    	String hash = la.run("tests.LanguageAdapterShould$OtherTestClass", "new","[]");
+    	String hash = la.run("imperiusgeorge.backend.tests.LanguageAdapterShould$OtherTestClass", "new","[]");
     	String res = la.run(hash,"isConstructed","[]");
 
     	assertEquals("true",res);
@@ -83,10 +83,11 @@ public class LanguageAdapterShould extends TestCase {
     public void testInstanceReturnParameter() throws Exception {
         String tag = "RESULT OF CALLED: ";
 
-        String hash = la.run("tests.LanguageAdapterShould$OtherTestClass", "new", "[]");
+        String hash = la.run("imperiusgeorge.backend.tests.LanguageAdapterShould$OtherTestClass", "new", "[]");
         la.run(hash,"setCalled","[true]");
         String res = la.run(hash,"getCalled","[\"" + tag + "\"]");
 
-        assertEquals(tag + "true",res);
+        assertEquals("\"" + tag + "true\"",res);
     }
+
 }

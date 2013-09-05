@@ -3,19 +3,25 @@ package imperiusgeorge.backend;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.json.simple.JSONArray;
+import org.json.simple.JSONValue;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 public class LanguageAdapter {
     private Map<String, Object> mStored = new HashMap<String, Object>();
+    private ArrayList<String> mLogMessages = new ArrayList<String>();
     JSONParser mParser = new JSONParser();
 
-    public void clear() { mStored.clear(); }
+    public void clear() {
+        mStored.clear();
+        mLogMessages.clear();
+    }
 
     public String run(String on, String method, String argsString)
                     throws IllegalAccessException, InvocationTargetException, ClassNotFoundException, InstantiationException, ParseException {
@@ -61,7 +67,7 @@ public class LanguageAdapter {
     private String adaptReturn(Object res) {
         log("returning "+res + " of "+res.getClass().getPackage());
         if (res != null && res.getClass().toString().contains("java.lang")) {
-            return "" + res;
+            return JSONValue.toJSONString(res);
         } else {
             String hashcode = "hash:"+res.hashCode();
             mStored.put(hashcode, res);
@@ -104,7 +110,13 @@ public class LanguageAdapter {
         return ret;
     }
 
-    public static void log(String s) {
+    public String exportLogs() {
+       return JSONValue.toJSONString(mLogMessages);
+    }
+
+    public void log(String s) {
+        mLogMessages.add(s);
         System.out.println(s);
     }
+
 }
