@@ -66,13 +66,12 @@ public class LanguageAdapter {
 
     private String adaptReturn(Object res) {
         log("returning "+res + " of "+res.getClass().getPackage());
-        if (res != null && res.getClass().toString().contains("java.lang")) {
-            return JSONValue.toJSONString(res);
-        } else {
-            String hashcode = "hash:"+res.hashCode();
-            mStored.put(hashcode, res);
-            return hashcode;
+        if (!res.getClass().toString().contains("java.lang")) {
+            Object obj = res;
+            res = "hash:"+res.hashCode();
+            mStored.put((String)res, obj);
         }
+        return JSONValue.toJSONString(res);
     }
 
     private String construct(Class<?> cl, List<?> args) throws InstantiationException, IllegalAccessException, InvocationTargetException{
