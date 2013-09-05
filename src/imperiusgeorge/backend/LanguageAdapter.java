@@ -1,4 +1,4 @@
-package backend;
+package imperiusgeorge.backend;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;

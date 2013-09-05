@@ -1,6 +1,6 @@
-package tests;
+package imperiusgeorge.backend.tests;
+import imperiusgeorge.backend.LanguageAdapter;
 import junit.framework.TestCase;
-import backend.LanguageAdapter;
 
 
 public class LanguageAdapterShould extends TestCase {

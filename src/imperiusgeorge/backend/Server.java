@@ -1,4 +1,4 @@
-package backend;
+package imperiusgeorge.backend;
 import java.util.Map;
 
 import fi.iki.elonen.NanoHTTPD;
