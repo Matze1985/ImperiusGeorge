@@ -90,4 +90,11 @@ public class LanguageAdapterShould extends TestCase {
         assertEquals("\"" + tag + "true\"",res);
     }
 
+    public void testPartialPackage() throws Exception {
+        TestClass.called = false;
+        la.setPackages("[\"imperiusgeorge.backend.tests\"]");
+        la.run("LanguageAdapterShould$TestClass", "call", "[]");
+
+        assertTrue(TestClass.called);
+    }
 }

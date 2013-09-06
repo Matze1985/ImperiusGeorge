@@ -3,6 +3,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.json.simple.JSONObject;
+import org.json.simple.parser.ParseException;
 
 import fi.iki.elonen.NanoHTTPD;
 import fi.iki.elonen.NanoHTTPD.Response.Status;
@@ -20,6 +21,7 @@ public class Server extends NanoHTTPD {
         try {
             if (uri.equalsIgnoreCase("/execute")) { return execute(params); }
             else if(method == Method.GET && uri.equalsIgnoreCase("/clean")) { return clean(); }
+            else if(method == Method.POST && uri.equalsIgnoreCase("/packages")) { return packages(params); }
         } catch(Exception e) {
             String exceptionString = exceptionToString(e);
             System.out.println(exceptionString);
@@ -27,6 +29,12 @@ public class Server extends NanoHTTPD {
             return new Response(Status.NOT_ACCEPTABLE,"application/json",exceptionJSON);
         }
         return new Response("no dice grandma, params are:" + params);
+    }
+
+    public Response packages(Map<String, String> params) throws ParseException {
+        la.setPackages(params.get("packages"));
+
+        return new Response(Status.OK,"text/plain","Packages set!");
     }
 
     public Response clean() {

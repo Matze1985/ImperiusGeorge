@@ -16,7 +16,12 @@ import org.json.simple.parser.ParseException;
 public class LanguageAdapter {
     private Map<String, Object> mStored = new HashMap<String, Object>();
     private ArrayList<String> mLogMessages = new ArrayList<String>();
+    private List<String> mPackages = new ArrayList<String>();
     JSONParser mParser = new JSONParser();
+
+    public LanguageAdapter() {
+        mPackages.add("");
+    }
 
     public void clear() {
         mStored.clear();
@@ -30,6 +35,10 @@ public class LanguageAdapter {
 
         JSONArray args = (JSONArray) mParser.parse(argsString);
         log("parsing args-string: "+argsString + " became: "+args);
+
+        String parsedOn = (String) JSONValue.parse(on);
+        if (parsedOn != null)
+            on = parsedOn;
 
         Class<?> cl = findClass(on);
         if (method.equals("new")) {
@@ -57,11 +66,12 @@ public class LanguageAdapter {
     }
 
     private Class<?> findClass(String string) {
-        try {
-            return Class.forName(string);
-        } catch (ClassNotFoundException e) {
-            return null;
+        for(String pack : mPackages) {
+            try {
+                return Class.forName(pack + string);
+            } catch (ClassNotFoundException e) { continue; }
         }
+        return null;
     }
 
     private String adaptReturn(Object res) {
@@ -118,4 +128,15 @@ public class LanguageAdapter {
         System.out.println(s);
     }
 
+    public void setPackages(String packages) throws ParseException {
+        JSONArray packs = (JSONArray) mParser.parse(packages);
+        ArrayList<String> fixedPacks = new ArrayList<String>();
+        for(Object pack : packs) {
+            String curPack = (String) pack;
+            if (curPack.charAt(curPack.length() - 1) != '.')
+                curPack += ".";
+            fixedPacks.add(curPack);
+        }
+        mPackages.addAll(fixedPacks);
+    }
 }
