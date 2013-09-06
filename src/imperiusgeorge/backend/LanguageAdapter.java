@@ -76,6 +76,7 @@ public class LanguageAdapter {
     }
 
     private String adaptReturn(Object res) {
+        if (res == null) { return ""; }
         UIHelp.log("returning "+res + " of "+res.getClass().getPackage());
         if (!res.getClass().toString().contains("java.lang")) {
             Object obj = res;

@@ -3,6 +3,8 @@ import imperiusgeorge.UIHelp;
 
 import java.util.Map;
 
+import junit.framework.AssertionFailedError;
+
 import org.json.simple.parser.ParseException;
 
 import fi.iki.elonen.NanoHTTPD;
@@ -22,11 +24,13 @@ public class Server extends NanoHTTPD {
             if (uri.equalsIgnoreCase("/execute")) { return execute(params); }
             else if(method == Method.GET && uri.equalsIgnoreCase("/clean")) { return clean(); }
             else if(method == Method.POST && uri.equalsIgnoreCase("/packages")) { return packages(params); }
-            else if (method == Method.GET && uri.equalsIgnoreCase("/clear")) { return clear(params); }
+            else if (method == Method.GET && uri.equalsIgnoreCase("/gc")) { return gc(params); }
+            else if (method == Method.GET && uri.equalsIgnoreCase("/dump")) { return screenDump(); }
         } catch (Throwable e) {
-            String report = UIHelp.getExceptionReport(e);
+            if (e.getCause() instanceof AssertionFailedError) { e = e.getCause(); }
             UIHelp.log("Reporting exception: " + UIHelp.exceptionToString(e));
-            return new Response(Status.NOT_ACCEPTABLE,"application/json",report);
+            e.printStackTrace();
+            return new Response(Status.NOT_ACCEPTABLE,"text/plain", UIHelp.exceptionToString(e));
         }
         return new Response("no dice grandma, params are:" + params);
     }
@@ -42,6 +46,11 @@ public class Server extends NanoHTTPD {
         return new Response(Status.OK,"text/plain","Cleaning successful!");
     }
 
+    public Response screenDump() {
+        UIHelp.log("Creating dump of views");
+        return new Response(Status.OK,"application/json", UIHelp.getScreenDump());
+    }
+
     public Response execute(Map<String,String> params) throws Exception {
         String on = params.get("on");
         String method = params.get("method");
@@ -52,7 +61,7 @@ public class Server extends NanoHTTPD {
         return new Response(Status.OK,"text/plain",res);
     }
 
-    public Response clear(Map<String,String> params) throws Exception {
+    public Response gc(Map<String,String> params) throws Exception {
         String on = params.get("on");
         String res = la.clear(on)? "sucess" : "no found!";
         return new Response(Status.OK,"text/plain",res);

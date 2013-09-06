@@ -14,8 +14,6 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import junit.framework.AssertionFailedError;
-
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
@@ -62,11 +60,9 @@ public class UIHelp {
         return ret;
     }
 
-    public static String getExceptionReport(Throwable e) {
-        if (e.getCause() instanceof AssertionFailedError) { e = e.getCause(); }
+    public static String getScreenDump() {
         Map<String,Object> resp = new HashMap<String,Object>();
         resp.put("logs", UIHelp.exportLogs());
-        resp.put("exception", UIHelp.exceptionToString(e));
         resp.put("screenshot_location", getScreenshot());
         resp.put("activity_name", getActivityName());
         resp.put("pkg", getCurrentTopActivity());
