@@ -1,5 +1,7 @@
 package imperiusgeorge.backend;
 
+import imperiusgeorge.UIHelp;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -15,7 +17,6 @@ import org.json.simple.parser.ParseException;
 
 public class LanguageAdapter {
     private Map<String, Object> mStored = new HashMap<String, Object>();
-    private ArrayList<String> mLogMessages = new ArrayList<String>();
     private List<String> mPackages = new ArrayList<String>();
     JSONParser mParser = new JSONParser();
 
@@ -25,7 +26,7 @@ public class LanguageAdapter {
 
     public void clear() {
         mStored.clear();
-        mLogMessages.clear();
+        UIHelp.clearLogs();
     }
 
     public String run(String on, String method, String argsString)
@@ -34,7 +35,7 @@ public class LanguageAdapter {
         Method[] methods = null;
 
         JSONArray args = (JSONArray) mParser.parse(argsString);
-        log("parsing args-string: "+argsString + " became: "+args);
+        UIHelp.log("parsing args-string: "+argsString + " became: "+args);
 
         String parsedOn = (String) JSONValue.parse(on);
         if (parsedOn != null)
@@ -42,13 +43,13 @@ public class LanguageAdapter {
 
         Class<?> cl = findClass(on);
         if (method.equals("new")) {
-            log("running constructor on class "+cl);
+            UIHelp.log("running constructor on class "+cl);
             return construct(cl,args);
         } else if (cl != null) {
-            log("running method '"+method+"' on static class "+cl);
+            UIHelp.log("running method '"+method+"' on static class "+cl);
             methods = cl.getDeclaredMethods();
         } else if ((instance = mStored.get(on)) != null) {
-            log("running method '"+method+"' on instance "+instance);
+            UIHelp.log("running method '"+method+"' on instance "+instance);
             methods = instance.getClass().getDeclaredMethods();
         } else { throw new ClassNotFoundException("Object/class '"+on+"' not found."); }
 
@@ -59,7 +60,7 @@ public class LanguageAdapter {
                 try {
                     Object ret = m.invoke(instance, adaptArgs(args, argTypes));
                     return (m.getReturnType() == Void.TYPE)? "" : adaptReturn(ret);
-                } catch (IllegalArgumentException e) { log("got ill:"+e); continue; }
+                } catch (IllegalArgumentException e) { UIHelp.log("got ill:"+e); continue; }
             }
         }
         throw new NoSuchMethodError("Method "+method+" not found. instance="+instance+", class="+cl);
@@ -75,7 +76,7 @@ public class LanguageAdapter {
     }
 
     private String adaptReturn(Object res) {
-        log("returning "+res + " of "+res.getClass().getPackage());
+        UIHelp.log("returning "+res + " of "+res.getClass().getPackage());
         if (!res.getClass().toString().contains("java.lang")) {
             Object obj = res;
             res = "hash:"+res.hashCode();
@@ -85,7 +86,7 @@ public class LanguageAdapter {
     }
 
     private String construct(Class<?> cl, List<?> args) throws InstantiationException, IllegalAccessException, InvocationTargetException{
-        log("construct = "+cl);
+        UIHelp.log("construct = "+cl);
         Constructor<?>[] constructors = cl.getDeclaredConstructors();
 
         for (Constructor<?> c : constructors) {
@@ -93,7 +94,7 @@ public class LanguageAdapter {
             if (argTypes.length == args.size()) {
                 try {
                     return adaptReturn(c.newInstance(adaptArgs(args,argTypes)));
-                } catch (IllegalArgumentException e) { log("got ill:"+e); continue; }
+                } catch (IllegalArgumentException e) { UIHelp.log("got ill:"+e); continue; }
             }
         }
 
@@ -119,13 +120,8 @@ public class LanguageAdapter {
         return ret;
     }
 
-    public String exportLogs() {
-       return JSONValue.toJSONString(mLogMessages);
-    }
-
-    public void log(String s) {
-        mLogMessages.add(s);
-        System.out.println(s);
+    public boolean clear(String on) {
+        return (null != mStored.remove(on));
     }
 
     public void setPackages(String packages) throws ParseException {
