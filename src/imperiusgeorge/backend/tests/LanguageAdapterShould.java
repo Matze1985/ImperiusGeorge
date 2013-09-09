@@ -112,4 +112,5 @@ public class LanguageAdapterShould extends TestCase {
 
         assertEquals("true",res);
     }
+
 }

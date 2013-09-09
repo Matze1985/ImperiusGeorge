@@ -60,7 +60,7 @@ public class LanguageAdapter {
             if (m.getName().equalsIgnoreCase(method) && argTypes.length == args.size()) {
                 try {
                     Object ret = m.invoke(instance, adaptArgs(args, argTypes));
-                    return (m.getReturnType() == Void.TYPE)? "" : adaptReturn(ret);
+                    return adaptReturn(ret);
                 } catch (IllegalArgumentException e) { UIHelp.log("got ill:"+e); continue; }
             }
         }
@@ -77,7 +77,7 @@ public class LanguageAdapter {
     }
 
     private String adaptReturn(Object res) {
-        if (res == null) { return ""; }
+        if (res == null) { res = ""; }
         UIHelp.log("returning "+res + " of "+res.getClass().getPackage());
         if (!res.getClass().toString().contains("java.lang")) {
             Object obj = res;
