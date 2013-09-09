@@ -2,6 +2,7 @@ package imperiusgeorge.backend;
 
 import imperiusgeorge.UIHelp;
 
+import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -115,8 +116,25 @@ public class LanguageAdapter {
                 else if (paramName.equals("float")) { ret[i] = num.floatValue(); }
                 else if (paramName.equals("double")) { ret[i] = num.doubleValue(); }
                 //if (Math.abs((ret[i] - num) < 0.0001) { throw new ArgumentError(); }
-            } else if (args.get(i) instanceof Boolean) { ret[i] = args.get(i); }
-            else { ret[i] = argTypes[i].cast(args.get(i)); }
+            } else if (args.get(i) instanceof Boolean) { 
+                ret[i] = args.get(i);
+            } else if (args.get(i) instanceof JSONArray && argTypes[i].isArray()) {
+                  JSONArray originalArr = (JSONArray) args.get(i);
+                  Class<?> arrType = argTypes[i].getComponentType();
+                  Object[] castedArr = (Object[]) Array.newInstance(arrType, originalArr.size());
+                  argTypes[i].cast(castedArr);
+                  for (int j = 0; j < originalArr.size(); j++) {
+                      castedArr[j] = arrType.cast(originalArr.get(j));
+                  }
+                  ret[i] = castedArr;
+            } else if (args.get(i) instanceof String) {
+                  String str = (String) args.get(i);
+                  if (str.contains("hash:")) {
+                      ret[i] = mStored.get(str);
+                  } else {
+                      ret[i] = str;
+                  }
+            } else { ret[i] = argTypes[i].cast(args.get(i)); }
         }
         return ret;
     }

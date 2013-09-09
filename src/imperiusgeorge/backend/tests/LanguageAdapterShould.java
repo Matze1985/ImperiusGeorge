@@ -23,6 +23,8 @@ public class LanguageAdapterShould extends TestCase {
         public static long callReturnLong() { return 10000L; }
         public static TestClass callReturnObj() { return new TestClass(); }
         public int instanceMethod() { return 45; }
+        public static boolean passInstance(OtherTestClass otc) { return otc.isConstructed(); }
+        public static String passStringArr(String[] texts) { return texts[0]; }
     }
 
     public static class OtherTestClass {
@@ -96,5 +98,18 @@ public class LanguageAdapterShould extends TestCase {
         la.run("LanguageAdapterShould$TestClass", "call", "[]");
 
         assertTrue(TestClass.called);
+    }
+
+    public void testStringArrayParameter() throws Exception {
+        String res = la.run("imperiusgeorge.backend.tests.LanguageAdapterShould$TestClass", "passStringArr", "[[\"first text\",\"second text\"]]");
+
+        assertEquals("\"first text\"",res);
+    }
+
+    public void testPassObject() throws Exception {
+        String hash = la.run("imperiusgeorge.backend.tests.LanguageAdapterShould$OtherTestClass", "new", "[]");
+        String res = la.run("imperiusgeorge.backend.tests.LanguageAdapterShould$TestClass","passInstance","[" + hash + "]");
+
+        assertEquals("true",res);
     }
 }
