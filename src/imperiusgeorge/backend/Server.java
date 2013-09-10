@@ -27,6 +27,7 @@ public class Server extends NanoHTTPD {
             else if (method == Method.GET && uri.equalsIgnoreCase("/gc")) { return gc(params); }
             else if (method == Method.GET && uri.equalsIgnoreCase("/dump")) { return screenDump(); }
             else if (method == Method.GET && uri.equalsIgnoreCase("/terminate")) { return terminate(); }
+            else if (method == Method.GET && uri.equalsIgnoreCase("/version")) { return version(); }
         } catch (Throwable e) {
             if (e.getCause() instanceof AssertionFailedError) { e = e.getCause(); }
             UIHelp.log("Reporting exception: " + UIHelp.exceptionToString(e));
@@ -34,6 +35,10 @@ public class Server extends NanoHTTPD {
             return new Response(Status.NOT_ACCEPTABLE,"text/plain", UIHelp.exceptionToString(e));
         }
         return new Response("no dice grandma, params are:" + params);
+    }
+
+    private Response version() {
+        return new Response(Status.OK,"text/plain","1.0.0");
     }
 
     private Response terminate() {
