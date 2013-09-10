@@ -7,7 +7,10 @@ import com.android.uiautomator.testrunner.UiAutomatorTestCase;
 public class TestServer extends UiAutomatorTestCase {
 
     public void testAndroidServer() throws Exception {
-        int port = getParams().getInt("port", 7120);
+        int port = 4242;
+        try {
+            port = Integer.parseInt((String) getParams().get("port"));
+        } catch(NumberFormatException e) {}
         Server server = new Server(port);
         server.start();
 
