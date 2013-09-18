@@ -43,7 +43,9 @@ public class Server extends NanoHTTPD {
 
     private Response terminate() {
         this.stop();
-        return new Response(Status.OK,"text/plain", "Terminating succcessful!");
+        UIHelp.log("Terminating server!");
+        System.exit(0);
+        return null;
     }
 
     public Response packages(Map<String, String> params) throws ParseException {

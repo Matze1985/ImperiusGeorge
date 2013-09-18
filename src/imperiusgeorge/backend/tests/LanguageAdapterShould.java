@@ -60,7 +60,7 @@ public class LanguageAdapterShould extends TestCase {
     }
 
     public void testMethodReturns() throws Exception {
-        assertEquals("", la.run("imperiusgeorge.backend.tests.LanguageAdapterShould$TestClass", "call", "[]"));
+        assertEquals("\"\"", la.run("imperiusgeorge.backend.tests.LanguageAdapterShould$TestClass", "call", "[]"));
         assertEquals("\"hello world\"", la.run("imperiusgeorge.backend.tests.LanguageAdapterShould$TestClass", "callReturnString", "[]"));
         assertEquals("42", la.run("imperiusgeorge.backend.tests.LanguageAdapterShould$TestClass", "callReturnInt", "[]"));
         assertEquals("3.14", la.run("imperiusgeorge.backend.tests.LanguageAdapterShould$TestClass", "callReturnDouble", "[]"));
