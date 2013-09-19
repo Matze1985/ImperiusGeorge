@@ -1,6 +1,7 @@
 package imperiusgeorge.backend;
 import imperiusgeorge.UIHelp;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 
 import junit.framework.AssertionFailedError;
@@ -30,6 +31,7 @@ public class Server extends NanoHTTPD {
             else if (method == Method.GET && uri.equalsIgnoreCase("/version")) { return version(); }
         } catch (Throwable e) {
             if (e.getCause() instanceof AssertionFailedError) { e = e.getCause(); }
+            else if (e instanceof InvocationTargetException) { e = e.getCause(); }
             UIHelp.log("Reporting exception: " + UIHelp.exceptionToString(e));
             e.printStackTrace();
             return new Response(Status.NOT_ACCEPTABLE,"text/plain", UIHelp.exceptionToString(e));
@@ -38,7 +40,7 @@ public class Server extends NanoHTTPD {
     }
 
     private Response version() {
-        return new Response(Status.OK,"text/plain","1.0.0");
+        return new Response(Status.OK,"text/plain","1.0.1");
     }
 
     private Response terminate() {

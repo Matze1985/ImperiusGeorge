@@ -50,11 +50,10 @@ public class UIHelp {
     }
 
     public static String exceptionToString(Throwable e) {
-        String ret = "";
         StackTraceElement[] stack = e.getStackTrace();
-        ret += "Exception: " + e.getMessage() + " at "+ stack[0];
-        for (int i=1; i < Math.min(6, stack.length); i++) {
-            ret += "   at "+stack[i].toString();
+        String ret = e.getClass().getSimpleName() + " :: " + e.getMessage() + "\n";
+        for (int i=0; i < Math.min(6, stack.length); i++) {
+            ret += "   at "+stack[i].toString() + "\n";
         }
         if (e.getCause() != null) { ret += "Cause:" + exceptionToString(e.getCause()); }
         return ret;
@@ -68,7 +67,7 @@ public class UIHelp {
         resp.put("pkg", getCurrentTopActivity());
         resp.put("text_views", getAllNamesOfClass("android.widget.TextView"));
         resp.put("buttons", getAllNamesOfClass("android.widget.Button"));
-        return JSONObject.toJSONString(resp);           
+        return JSONObject.toJSONString(resp);
     }
 
     public static String getScreenshot() {
