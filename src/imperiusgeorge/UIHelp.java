@@ -134,6 +134,20 @@ public class UIHelp {
     }
 
     /** Click this item. Fails with lots of debug output. */
+    public static boolean clickAndWaitForNewWindow(UiObject item, long timeout) {
+        if (item.exists()) {
+            try {
+                return item.clickAndWaitForNewWindow(timeout);
+            } catch (Exception e) {
+                fail("click failed");
+            }
+        } else {
+            fail("click failed");
+        }
+        return false;
+    }
+
+    /** Click this item. Fails with lots of debug output. */
     public static void clickAndWaitForNewWindow(String viewText) {
         UiObject item = find(viewText);
         if (!item.exists()) {
