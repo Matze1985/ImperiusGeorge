@@ -1,4 +1,3 @@
-![funny george image](https://github.com/lookout/ImperiusGeorge/raw/master/libs/george.jpg)
 # ImperiusGeorge
 ###Remote-control/execute Java on Android phones via Ruby
 
