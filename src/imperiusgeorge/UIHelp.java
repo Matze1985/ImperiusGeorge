@@ -205,6 +205,10 @@ public class UIHelp {
         return settingsItem;
     }
 
+    public static void openNotificationBar() {
+        UiDevice.getInstance().openNotification();
+    }
+
     /* ----- other useful DOM interaction ----- */
 
     public static boolean hasViewWithExactText(String text) {
