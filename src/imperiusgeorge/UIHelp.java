@@ -257,6 +257,10 @@ public class UIHelp {
         return new UiObject(new UiSelector().description(text));
     }
 
+    public static UiObject findViaResourceId(String id) {
+        return new UiObject(new UiSelector().resourceId(id));
+    }
+
     public static UiObject findItemInList(String text) throws UiObjectNotFoundException {
         UiScrollable settingsItem = getScrollView();
         return settingsItem.getChildByText(new UiSelector().className("android.widget.LinearLayout"), text);
