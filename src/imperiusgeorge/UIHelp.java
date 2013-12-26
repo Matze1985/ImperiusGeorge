@@ -119,6 +119,20 @@ public class UIHelp {
         }
     }
 
+    /** Look for any one of the supplied strings and click it. */
+    public static void click(String[] viewTexts) {
+        for (String viewText : viewTexts) {
+            UiObject item = find(viewText);
+
+            if (item.exists()) {
+                click(item);
+                return;
+            }
+        }
+
+        fail("Couldn't find any of the supplied text: " + Arrays.toString(viewTexts));
+    }
+
     /** Click this item. Fails with lots of debug output. */
     public static boolean clickAndWaitForNewWindow(UiObject item) {
         if (item.exists()) {
@@ -147,7 +161,7 @@ public class UIHelp {
         return false;
     }
 
-    /** Click this item. Fails with lots of debug output. */
+    /** Click this item */
     public static void clickAndWaitForNewWindow(String viewText) {
         UiObject item = find(viewText);
         if (!item.exists()) {
