@@ -120,9 +120,9 @@ public class UIHelp {
     }
 
     /** Look for any one of the supplied strings and click it. */
-    public static void click(String[] viewTexts) {
+    public static void findAndClickStringFromArray(String[] viewTexts) {
         for (String viewText : viewTexts) {
-            UiObject item = find(viewText);
+            UiObject item = findViewThatContains(viewText);
 
             if (item.exists()) {
                 click(item);
