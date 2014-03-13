@@ -209,14 +209,24 @@ public class UIHelp {
         }
     }
 
-    public static UiScrollable getScrollView() {
-        UiScrollable settingsItem = new UiScrollable(new UiSelector().className("android.widget.ListView"));
+    public static UiScrollable getListView() {
+        UiScrollable listItems = new UiScrollable(new UiSelector().className("android.widget.ListView"));
         try {
-            settingsItem.setMaxSearchSwipes(10);
+            listItems.setMaxSearchSwipes(10);
         } catch (NoSuchMethodError e) {
             log("setMaxSearchSwipes() not supported!!??");
         }
-        return settingsItem;
+        return listItems;
+    }
+
+    public static UiScrollable getScrollView() {
+        UiScrollable scrollableLayout = new UiScrollable(new UiSelector().className("android.widget.ScrollView"));
+        try {
+            scrollableLayout.setMaxSearchSwipes(10);
+        } catch (NoSuchMethodError e) {
+            log("setMaxSearchSwipes() not supported!!??");
+        }
+        return scrollableLayout;
     }
 
     public static void openNotificationBar() {
@@ -276,7 +286,7 @@ public class UIHelp {
     }
 
     public static UiObject findItemInList(String text) throws UiObjectNotFoundException {
-        UiScrollable settingsItem = getScrollView();
+        UiScrollable settingsItem = getListView();
         return settingsItem.getChildByText(new UiSelector().className("android.widget.LinearLayout"), text);
     }
 
