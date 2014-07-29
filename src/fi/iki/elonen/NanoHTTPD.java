@@ -392,7 +392,16 @@ public abstract class NanoHTTPD {
         private final List<TempFile> tempFiles;
 
         public DefaultTempFileManager() {
-            tmpdir = System.getProperty("java.io.tmpdir");
+            /* This is a bit of a hack.  Before Android L prerelease (5.0)
+             * we called this:
+             *  tmpdir = System.getProperty("java.io.tmpdir");
+             * to get the $TMP directory.  This always pointed to
+             * "/sdcard" in the past, but with Android L it points
+             * to "/tmp", which does not exist.  By using "/sdcard"
+             * we remain compatible with older Androids but can run
+             * in Android L without a problem.
+             */
+            tmpdir = "/sdcard";
             tempFiles = new ArrayList<TempFile>();
         }
 
